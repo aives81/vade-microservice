@@ -19,15 +19,16 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Set up Go 1.23
-      - uses: actions/setup-go@v4
+      - name: Set up Go
+        uses: actions/setup-go@v4
         with:
           go-version: 1.23
 
       - name: Run tests
-      - run: go test ./...
-      - name: Build
-      - run: go build -o vade-doc-mngt-api
+        run: go test ./...
+
+      - name: Build binary
+        run: go build -o vade-doc-mngt-api
 
   build-and-deploy-on-dockerhub:
     runs-on: ubuntu-latest
@@ -36,8 +37,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: Build image on docker
-        run: docker image build -t ${{ secrets.DOCKER_USERNAME }}/vade-doc-mngt-api:latest -f Dockerfile .
+      - name: Build Docker image
+        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/vade-doc-mngt-api:latest -f Dockerfile .
 
       - name: Push Docker image
         env:
