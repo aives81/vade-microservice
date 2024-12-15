@@ -21,6 +21,12 @@ func TestCreateDocument(t *testing.T) {
 		err := services.CreateDocument(doc)
 		assert.Error(t, err, "Should return an error for duplicate ID")
 	})
+
+	t.Run("Create document with empty data", func(t *testing.T) {
+		doc := models.Document{ID: "", Name: "", Description: ""}
+		err := services.CreateDocument(doc)
+		assert.Error(t, err, "Should return an error for duplicate ID")
+	})
 }
 
 func TestGetAllDocuments(t *testing.T) {
@@ -31,14 +37,9 @@ func TestGetAllDocuments(t *testing.T) {
 	})
 
 	t.Run("Get all documents after creation", func(t *testing.T) {
-		err := services.CreateDocument(models.Document{ID: "1", Name: "Doc 1", Description: "Description 1"})
-		if err != nil {
-			return
-		}
-		err1 := services.CreateDocument(models.Document{ID: "2", Name: "Doc 2", Description: "Description 2"})
-		if err1 != nil {
-			return
-		}
+		_ = services.CreateDocument(models.Document{ID: "1", Name: "Doc 1", Description: "Description 1"})
+		_ = services.CreateDocument(models.Document{ID: "2", Name: "Doc 2", Description: "Description 2"})
+
 		docs := services.GetAllDocuments()
 		assert.Len(t, docs, 2, "Should return a list of 2 documents")
 	})
@@ -63,10 +64,7 @@ func TestGetDocumentByID(t *testing.T) {
 }
 
 func TestDeleteDocumentByID(t *testing.T) {
-	err := services.CreateDocument(models.Document{ID: "1", Name: "Doc 1", Description: "Description 1"})
-	if err != nil {
-		return
-	}
+	_ = services.CreateDocument(models.Document{ID: "1", Name: "Doc 1", Description: "Description 1"})
 
 	t.Run("Delete existing document", func(t *testing.T) {
 		err := services.DeleteDocumentByID("1")
