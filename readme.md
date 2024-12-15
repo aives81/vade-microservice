@@ -17,6 +17,14 @@ Pour lancer le projet, il suffit de lancer la commande suivante:
 # Routes
 ### Création d'un document
 - POST /documents
+#### Le body de la requête doit être de la forme suivante:
+```json
+{
+  "id": "identifiant",
+  "name": "nom du document",
+  "description": "description du document",
+}
+```
 ### Liste des documents
 - GET /documents
 ### Détails d'un document

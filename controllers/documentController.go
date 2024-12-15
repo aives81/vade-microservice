@@ -17,11 +17,28 @@ func HandleDocuments(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "Invalid request payload", http.StatusBadRequest)
 			return
 		}
-		services.CreateDocument(doc)
+		err1 := services.CreateDocument(doc)
+		if err1 != nil {
+			http.Error(w, err1.Error(), http.StatusBadRequest)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusCreated)
+		_, err = w.Write([]byte(`{"message": "Document created successfully"}`))
+		if err != nil {
+			return
+		}
 	case "GET":
 		docs := services.GetAllDocuments()
-		json.NewEncoder(w).Encode(docs)
+		if len(docs) == 0 {
+			http.Error(w, "Nothing to display", http.StatusNotFound)
+			return
+		}
+		w.Header().Set("Content-Type", "application/json")
+		err := json.NewEncoder(w).Encode(docs)
+		if err != nil {
+			return
+		}
 	default:
 		http.Error(w, "Method not allowed", http.StatusMethodNotAllowed)
 	}
@@ -36,14 +53,15 @@ func HandleDocumentByID(w http.ResponseWriter, r *http.Request) {
 
 	switch r.Method {
 	case "GET":
-		doc, found := services.GetDocumentByID(id)
-		if !found {
+		doc, _ := services.GetDocumentByID(id)
+		if doc == (models.Document{}) {
 			http.Error(w, "Document not found", http.StatusNotFound)
 			return
 		}
+		w.Header().Set("Content-Type", "application/json")
 		json.NewEncoder(w).Encode(doc)
 	case "DELETE":
-		if services.DeleteDocumentByID(id) {
+		if services.DeleteDocumentByID(id) == nil {
 			w.WriteHeader(http.StatusNoContent)
 		} else {
 			http.Error(w, "Document not found", http.StatusNotFound)
